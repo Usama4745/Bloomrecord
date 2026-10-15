@@ -4,6 +4,16 @@ A fully local screen recorder for Windows, macOS and Linux, inspired by Loom. Re
 
 > **Privacy:** recordings, thumbnails, the library database and settings never leave your computer. BloomRecord makes no network requests: no account, no uploads, no license checks, no analytics or telemetry. The camera, microphone and screen are only accessed while you set up or make a recording.
 
+## Install (Windows)
+
+**[⬇ Download BloomRecord-Setup-0.1.0-x64.exe](installer/BloomRecord-Setup-0.1.0-x64.exe)** (Windows 10/11, 64-bit, about 195 MB)
+
+Run the downloaded file. It installs to `%LocalAppData%\bloomrecord` without asking for admin rights, adds Start Menu and desktop shortcuts, and launches the app. To uninstall, use Windows Settings → Apps.
+
+The installer is unsigned, so Windows SmartScreen will warn on first run: choose **More info → Run anyway**.
+
+For maintainers: `npm run make` rebuilds the installer and copies it into `installer/` (see [Building releases](#building-releases)). When you bump the version in `package.json`, update the link above to the new filename.
+
 ## Features
 
 - Screen + camera, screen only, or camera only recording; pick any screen or window
