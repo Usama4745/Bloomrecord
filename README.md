@@ -6,13 +6,13 @@ A fully local screen recorder for Windows, macOS and Linux, inspired by Loom. Re
 
 ## Install (Windows)
 
-**[⬇ Download BloomRecord-Setup-0.1.0-x64.exe](installer/BloomRecord-Setup-0.1.0-x64.exe)** (Windows 10/11, 64-bit, about 195 MB)
+**[⬇ Download BloomRecord-Setup-0.1.0-x64.exe](https://github.com/Usama4745/Bloomrecord/releases/download/v0.1.0/BloomRecord-Setup-0.1.0-x64.exe)** (Windows 10/11, 64-bit, about 195 MB) · [Release notes and all downloads](https://github.com/Usama4745/Bloomrecord/releases)
 
 Run the downloaded file. It installs to `%LocalAppData%\bloomrecord` without asking for admin rights, adds Start Menu and desktop shortcuts, and launches the app. To uninstall, use Windows Settings → Apps.
 
 The installer is unsigned, so Windows SmartScreen will warn on first run: choose **More info → Run anyway**.
 
-For maintainers: `npm run make` rebuilds the installer and copies it into `installer/` (see [Building releases](#building-releases)). When you bump the version in `package.json`, update the link above to the new filename.
+For maintainers: `npm run make` rebuilds the installer and copies it into `installer/` (see [Building releases](#building-releases)). To publish a new version, bump `version` in `package.json`, run `npm run make`, create a GitHub Release tagged `v<version>` with the file from `installer/` attached, then update the download link above to the new tag and filename.
 
 ## Features
 

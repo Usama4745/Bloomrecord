@@ -153,3 +153,6 @@ resources/ffmpeg/ffprobe.exe
 resources/ffmpeg/target.json
 test-results/
 playwright-report/
+
+# Local copy of the Windows installer for uploading to GitHub Releases
+installer/
