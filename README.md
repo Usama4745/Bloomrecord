@@ -18,6 +18,7 @@ For maintainers: `npm run make` rebuilds the installer and copies it into `insta
 
 - Screen + camera, screen only, or camera only recording; pick any screen or window
 - Circular, aspect-correct webcam bubble (S/M/L, any corner) composited into the final MP4
+- Webcam background blur (light/strong) or replacement (built-in gradients or your own image). It's computed on-device with a bundled MediaPipe segmentation model and keeps running while the window is minimized.
 - Microphone plus system audio (Windows), mixed without clipping
 - Pause / resume / stop, a countdown, and global shortcuts (`Ctrl/⌘+Shift+9` pause, `Ctrl/⌘+Shift+0` stop)
 - Data written to disk progressively; interrupted sessions (crash, power loss, quitting) can be recovered
@@ -151,13 +152,19 @@ Platform notes:
 - **Linux:** on Wayland, the desktop portal (xdg-desktop-portal + PipeWire) shows its own picker when recording starts, so the in-app source list is replaced by a notice. **System audio isn't captured directly.** Choose a PulseAudio/PipeWire "Monitor of …" input as the microphone instead.
 - **Window capture:** if a captured window is resized, the output is letterboxed to the first frame size (no stretching). If the window closes, the recording stops automatically.
 - **Unplugged devices:** if the camera or microphone is unplugged mid-recording, recording continues and that track ends early (the bubble disappears, or audio falls silent).
+- **Background effects:**
+  - They need Chromium's `MediaStreamTrackProcessor`, which Electron provides, and run on the GPU with a CPU fallback.
+  - Edge quality around hair and fast motion is similar to Zoom or Teams.
+  - On older machines, effects add load while recording; set the effect to *None* if frames drop.
+  - The automated tests use Chromium's synthetic camera, which contains no person, so segmentation quality on real people has not been measured automatically.
+  - The model (`public/models/selfie_segmenter_landscape.tflite`, Apache-2.0) and the MediaPipe runtime are bundled; the runtime is copied from `node_modules` by `scripts/prepare-mediapipe.mjs`.
 - **Fast-copy trimming:** cuts snap to the nearest keyframe (the encoder emits one every 2 s). Use frame-accurate mode for exact cuts.
 
 ## Security model
 
 - The renderer runs with `contextIsolation`, `sandbox` and no `nodeIntegration`. It sees only `window.bloom`, a narrow, typed API over fixed IPC channels.
 - Every IPC request is checked for a trusted sender (our own top-level frame), validated with strict Zod schemas, and answered with a `{ ok, data | error }` envelope. Internal error details stay in the main process.
-- Production UI is served from a custom `app://` protocol with a strict CSP (`default-src 'none'`, no remote origins, no `unsafe-eval`). Navigation, new windows and webviews are blocked.
+- Production UI is served from a custom `app://` protocol with a strict CSP (`default-src 'none'`, no remote origins, no `unsafe-eval`). The only script relaxation is `'wasm-unsafe-eval'`, which allows compiling the bundled WebAssembly used for background segmentation and nothing else. Navigation, new windows and webviews are blocked.
 - The renderer never supplies file paths.
   - Media is streamed by recording ID through `bloom-media://`, which supports range requests.
   - Output folders and export destinations come only from native dialogs shown by main.

@@ -14,6 +14,9 @@ import type {
   settingsSchema,
   startRecordingRequestSchema,
   themeSchema,
+  backgroundEffectSchema,
+  backgroundBlurSchema,
+  backgroundPresetSchema,
   trackKindSchema,
   trackSpecSchema,
 } from './validation';
@@ -27,6 +30,14 @@ export type QualityPreset = z.infer<typeof qualityPresetSchema>;
 export type ResolutionPreset = z.infer<typeof resolutionPresetSchema>;
 export type FrameRate = z.infer<typeof frameRateSchema>;
 export type Theme = z.infer<typeof themeSchema>;
+export type BackgroundEffect = z.infer<typeof backgroundEffectSchema>;
+export type BackgroundBlur = z.infer<typeof backgroundBlurSchema>;
+export type BackgroundPreset = z.infer<typeof backgroundPresetSchema>;
+
+export interface BackgroundImageData {
+  mimeType: 'image/png' | 'image/jpeg' | 'image/webp';
+  data: Uint8Array;
+}
 export type Settings = z.infer<typeof settingsSchema>;
 export type SettingsPatch = z.infer<typeof settingsPatchSchema>;
 export type StartRecordingRequest = z.infer<typeof startRecordingRequestSchema>;

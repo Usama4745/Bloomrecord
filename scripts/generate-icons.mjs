@@ -1,4 +1,4 @@
-// Renders the app icon (pink→violet rounded square with a record ring) with
+// Renders the app icon (brand #263D42 gradient rounded square with a record ring) with
 // the bundled FFmpeg and writes icon.png, icon.ico and icon.icns into
 // resources/icons. Run once; the outputs are committed.
 import { execFileSync } from 'node:child_process';
@@ -26,7 +26,7 @@ function render(size, file) {
   execFileSync(ffmpeg, [
     '-hide_banner', '-v', 'error', '-y',
     '-f', 'lavfi', '-i', `color=c=black:s=${S}x${S},format=rgba`,
-    '-vf', `geq=r='${mix(240, 139)}':g='${mix(80, 92)}':b='${mix(154, 246)}':a='${alpha}'`,
+    '-vf', `geq=r='${mix(91, 38)}':g='${mix(140, 61)}':b='${mix(150, 66)}':a='${alpha}'`,
     '-frames:v', '1', file,
   ]);
 }

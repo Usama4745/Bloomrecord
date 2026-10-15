@@ -18,6 +18,10 @@ export function defaultSettings(outputDir: string): Settings {
     theme: 'system',
     countdownSeconds: 3,
     minimizeOnRecord: false,
+    backgroundEffect: 'none',
+    backgroundBlur: 'strong',
+    backgroundPreset: 'aurora',
+    backgroundCustomImage: null,
   };
 }
 
@@ -55,6 +59,12 @@ export class SettingsRepo {
   update(patch: SettingsPatch): Settings {
     const valid = settingsPatchSchema.parse(patch);
     this.write(valid);
+    return this.get();
+  }
+
+  /** Only for main-process callers: records the stored custom background file name. */
+  setBackgroundCustomImage(fileName: string | null): Settings {
+    this.write({ backgroundCustomImage: settingsSchema.shape.backgroundCustomImage.parse(fileName) });
     return this.get();
   }
 

@@ -34,6 +34,8 @@ const MIME: Record<string, string> = {
   '.ttf': 'font/ttf',
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
+  '.wasm': 'application/wasm',
+  '.tflite': 'application/octet-stream',
 };
 
 /** Serves the built renderer from disk under app://bloomrecord/, with a strict CSP. */

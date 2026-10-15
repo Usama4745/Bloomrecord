@@ -3,6 +3,8 @@ import { Camera, FolderOpen, Info, Mic, Monitor, MonitorPlay, Pause, Play, Squar
 import type { CaptureSource, FrameRate, RecordingMode, ResolutionPreset } from '@shared/recording-types';
 import { bloom, errorMessage } from '@/services/bloom';
 import { useAudioLevel, useDeviceStream, useDevices } from '@/hooks/use-media';
+import { useBackgroundEffect } from '@/hooks/use-background';
+import { BackgroundPicker } from './background-picker';
 import { useAppStore } from '@/stores/app-store';
 import { useRecorderStore } from '@/stores/recorder-store';
 import { toast } from '@/stores/toast-store';
@@ -35,10 +37,13 @@ export function RecorderPage() {
 
   // Live preview streams double as the recording streams, so the camera stays
   // warm and starts instantly. They are released when leaving this page.
-  const camera = useDeviceStream('camera', usesCamera, settings.cameraDeviceId, mode === 'camera');
+  const rawCamera = useDeviceStream('camera', usesCamera, settings.cameraDeviceId, mode === 'camera');
+  // The background effect (if any) is applied here, so previews and the recording use the same processed camera.
+  const background = useBackgroundEffect(rawCamera.stream, settings);
+  const camera = { ...rawCamera, stream: background.stream, loading: rawCamera.loading || background.status === 'loading' };
   const mic = useDeviceStream('mic', micEnabled, micId);
   const level = useAudioLevel(mic.stream);
-  const devices = useDevices(`${camera.stream?.id ?? ''}${mic.stream?.id ?? ''}`);
+  const devices = useDevices(`${rawCamera.stream?.id ?? ''}${mic.stream?.id ?? ''}`);
 
   const [screenPermission, setScreenPermission] = useState<string>('granted');
   useEffect(() => {
@@ -175,6 +180,12 @@ export function RecorderPage() {
                 onValueChange={(v) => void updateSettings({ cameraDeviceId: v === DEFAULT_DEVICE ? null : v })}
                 options={cameraOptions}
               />
+              <div className="flex flex-col gap-2 border-t pt-3" data-background-status={background.status}>
+                <Label className="text-xs text-muted-foreground">Background</Label>
+                <BackgroundPicker settings={settings} compact />
+                {background.status === 'loading' && <p className="text-xs text-muted-foreground">Starting background effect…</p>}
+                {background.error && <p className="text-xs text-destructive">{background.error} Choose “None” to record without it.</p>}
+              </div>
             </Card>
           )}
 
@@ -284,8 +295,15 @@ export function RecorderPage() {
           <Button size="lg" variant="record" className="h-12 text-base" disabled={!canStart} onClick={start} data-testid="start-recording">
             <span className="size-3 rounded-full bg-white" /> Start recording
           </Button>
-          <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
-            <Info className="size-3" /> While recording: <Kbd>{MOD}+Shift+9</Kbd> pause · <Kbd>{MOD}+Shift+0</Kbd> stop
+          <p className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-[11px] text-muted-foreground">
+            <Info className="size-3" /> While recording:
+            <span className="whitespace-nowrap">
+              <Kbd>{MOD}+Shift+9</Kbd> pause
+            </span>
+            ·
+            <span className="whitespace-nowrap">
+              <Kbd>{MOD}+Shift+0</Kbd> stop
+            </span>
           </p>
         </div>
       </div>

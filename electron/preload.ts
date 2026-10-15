@@ -59,6 +59,8 @@ const api: BloomApi = {
     cleanupTemp: () => call(C.settingsCleanupTemp),
     diagnostics: () => call(C.settingsDiagnostics),
     openOutputDir: () => call(C.settingsOpenOutputDir),
+    chooseBackgroundImage: () => call(C.settingsChooseBackgroundImage),
+    getBackgroundImage: () => call(C.settingsGetBackgroundImage),
   },
   on(event, listener) {
     if (!allowedEvents.has(event)) throw new Error(`Unknown event: ${String(event)}`);

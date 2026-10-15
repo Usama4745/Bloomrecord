@@ -9,6 +9,8 @@ export interface AppPaths {
   /** Raw per-track capture files for in-progress or recoverable sessions. */
   sessions: string;
   logs: string;
+  /** User-supplied webcam background images. */
+  backgrounds: string;
 }
 
 export function createAppPaths(userData: string): AppPaths {
@@ -18,8 +20,9 @@ export function createAppPaths(userData: string): AppPaths {
     thumbnails: path.join(userData, 'thumbnails'),
     sessions: path.join(userData, 'sessions'),
     logs: path.join(userData, 'logs'),
+    backgrounds: path.join(userData, 'backgrounds'),
   };
-  for (const dir of [paths.userData, paths.thumbnails, paths.sessions, paths.logs]) {
+  for (const dir of [paths.userData, paths.thumbnails, paths.sessions, paths.logs, paths.backgrounds]) {
     fs.mkdirSync(dir, { recursive: true });
   }
   return paths;

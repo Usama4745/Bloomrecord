@@ -59,7 +59,8 @@ function createWindow(context: AppContext): BrowserWindow {
     show: false,
     title: 'BloomRecord',
     autoHideMenuBar: true,
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0b0b10' : '#f7f7fb',
+    // Matches --background (brand-tinted) so there is no flash before the UI paints.
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0c1517' : '#f7fafa',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,

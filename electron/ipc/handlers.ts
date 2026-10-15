@@ -22,6 +22,7 @@ import type { Diagnostics } from '@shared/recording-types';
 import type { AppContext } from '../app-context';
 import { listCaptureSources } from '../capture/display-media';
 import { cleanupTemporaryFiles } from '../storage/cleanup';
+import { importBackgroundImage, readBackgroundImage } from '../library/background-images';
 import { directorySize } from '../storage/paths';
 import { createRegistrar } from './handle';
 
@@ -119,6 +120,23 @@ export function registerIpcHandlers(ctx: AppContext, getWindow: () => BrowserWin
     const err = await shell.openPath(dir);
     if (err) throw new Error(err);
   });
+  handle(C.settingsChooseBackgroundImage, null, async () => {
+    const win = getWindow();
+    const opts = {
+      title: 'Choose a background image',
+      filters: [{ name: 'Images', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+      properties: ['openFile'] as Array<'openFile'>,
+    };
+    const result = win ? await dialog.showOpenDialog(win, opts) : await dialog.showOpenDialog(opts);
+    const file = result.filePaths[0];
+    if (result.canceled || !file) return null;
+    const fileName = await importBackgroundImage(file, ctx.paths.backgrounds);
+    settings.setBackgroundCustomImage(fileName);
+    const next = settings.update({ backgroundEffect: 'image', backgroundPreset: 'custom' });
+    ctx.onSettingsChanged(next);
+    return next;
+  });
+  handle(C.settingsGetBackgroundImage, null, () => readBackgroundImage(ctx.paths.backgrounds, settings.get().backgroundCustomImage));
   handle(C.settingsCleanupTemp, null, () =>
     cleanupTemporaryFiles({
       paths: ctx.paths,

@@ -25,12 +25,12 @@ export function Sidebar() {
   const capturing = recPhase === 'recording' || recPhase === 'paused';
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r bg-sidebar px-3 py-4">
+    <aside className="flex w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-3 py-4 text-sidebar-foreground">
       <div className="mb-6 flex items-center gap-2.5 px-2">
         <Logo className="size-8" />
         <div className="leading-tight">
           <div className="text-[15px] font-semibold tracking-tight">BloomRecord</div>
-          <div className="text-[11px] text-muted-foreground">Local screen recorder</div>
+          <div className="text-[11px] text-sidebar-muted">Local screen recorder</div>
         </div>
       </div>
 
@@ -45,8 +45,8 @@ export function Sidebar() {
               disabled={locked && r !== 'record'}
               aria-current={current ? 'page' : undefined}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground disabled:opacity-40 disabled:hover:bg-transparent',
-                current && 'bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground',
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-muted transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground disabled:opacity-40 disabled:hover:bg-transparent',
+                current && 'bg-sidebar-accent text-sidebar-accent-foreground hover:bg-sidebar-accent',
               )}
             >
               <Icon className="size-4" />
@@ -64,18 +64,18 @@ export function Sidebar() {
 
       <div className="mt-auto flex flex-col gap-3">
         {active.length > 0 && (
-          <div className="rounded-lg border bg-card p-3 text-xs" aria-live="polite">
+          <div className="rounded-lg border border-sidebar-border bg-sidebar-accent p-3 text-xs" aria-live="polite">
             <div className="mb-2 flex items-center gap-2 font-medium">
-              <Loader2 className="size-3.5 animate-spin text-primary" />
+              <Loader2 className="size-3.5 animate-spin" />
               {active.length === 1 ? 'Processing' : `Processing (${active.length})`}
             </div>
-            <p className="mb-2 truncate text-muted-foreground" title={running?.label}>
+            <p className="mb-2 truncate text-sidebar-muted" title={running?.label}>
               {running?.label ?? 'Queued'}
             </p>
-            <Progress value={(running?.progress ?? 0) * 100} indeterminate={running?.progress === null} />
+            <Progress className="bg-sidebar-border [&>div]:bg-sidebar-foreground" value={(running?.progress ?? 0) * 100} indeterminate={running?.progress === null} />
           </div>
         )}
-        <p className="px-2 text-[11px] leading-snug text-muted-foreground">Recordings stay on this device. No account, no cloud.</p>
+        <p className="px-2 text-[11px] leading-snug text-sidebar-muted">Recordings stay on this device. No account, no cloud.</p>
       </div>
     </aside>
   );

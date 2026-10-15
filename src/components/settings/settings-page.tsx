@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/overlays';
 import { Card, Label, Segmented, Switch } from '@/components/ui/primitives';
 import { BubblePositionPicker } from '@/components/recorder/media-bits';
+import { BackgroundPicker } from '@/components/recorder/background-picker';
 
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
@@ -178,6 +179,13 @@ export function SettingsPage() {
           />
           <BubblePositionPicker value={settings.bubblePosition} onChange={(p) => void update({ bubblePosition: p })} />
         </Row>
+        <div className="flex flex-col gap-3 py-3">
+          <div>
+            <Label>Camera background</Label>
+            <div className="mt-1 text-xs text-muted-foreground">Blur or replace what's behind you. Runs entirely on this computer.</div>
+          </div>
+          <BackgroundPicker settings={settings} />
+        </div>
         <Row label="Countdown before recording" htmlFor="countdown">
           <Select
             id="countdown"

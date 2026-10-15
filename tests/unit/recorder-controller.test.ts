@@ -181,8 +181,8 @@ describe('recorder controller', () => {
     expect(screen).toEqual(['s1', 's2', 'final-screen']);
     expect(t.written.filter((w) => w.kind === 'camera').map((w) => w.text)).toEqual(['final-camera']);
     // stop() reaches main only after every final chunk was written.
-    const stopOrder = t.recording.stop.mock.invocationCallOrder[0]!;
-    expect(Math.max(...t.recording.writeChunk.mock.invocationCallOrder)).toBeLessThan(stopOrder);
+    const stopOrder = vi.mocked(t.recording.stop).mock.invocationCallOrder[0]!;
+    expect(Math.max(...vi.mocked(t.recording.writeChunk).mock.invocationCallOrder)).toBeLessThan(stopOrder);
     expect(t.recording.stop).toHaveBeenCalledWith('sess-1', 'My title');
     expect(t.controller.currentPhase).toBe('stopped');
     await expect(t.controller.stop()).rejects.toBeInstanceOf(RecorderStateError);

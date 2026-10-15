@@ -30,7 +30,8 @@ export function buildCsp(dev: boolean): string {
   const directives = [
     "default-src 'none'",
     // Vite's React refresh preamble is an inline script in development only.
-    dev ? "script-src 'self' 'unsafe-inline'" : "script-src 'self'",
+    // 'wasm-unsafe-eval' permits compiling WebAssembly (local background segmentation) and nothing else.
+    dev ? "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'" : "script-src 'self' 'wasm-unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
     "img-src 'self' data: blob: bloom-media:",

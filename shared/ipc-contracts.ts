@@ -1,4 +1,5 @@
 import type {
+  BackgroundImageData,
   CaptureSource,
   CleanupResult,
   Diagnostics,
@@ -60,6 +61,8 @@ export const IpcChannels = {
   settingsCleanupTemp: 'settings:cleanup-temp',
   settingsDiagnostics: 'settings:diagnostics',
   settingsOpenOutputDir: 'settings:open-output-dir',
+  settingsChooseBackgroundImage: 'settings:choose-background-image',
+  settingsGetBackgroundImage: 'settings:get-background-image',
 } as const;
 
 export type IpcChannel = (typeof IpcChannels)[keyof typeof IpcChannels];
@@ -169,6 +172,10 @@ export interface BloomApi {
     cleanupTemp(): Promise<CleanupResult>;
     diagnostics(): Promise<Diagnostics>;
     openOutputDir(): Promise<void>;
+    /** Lets the user pick a background image (native dialog). Resolves the new settings, or null if cancelled. */
+    chooseBackgroundImage(): Promise<Settings | null>;
+    /** Bytes of the custom background image, or null if none is set. */
+    getBackgroundImage(): Promise<BackgroundImageData | null>;
   };
   on<E extends IpcEvent>(event: E, listener: (payload: IpcEventPayloads[E]) => void): () => void;
 }

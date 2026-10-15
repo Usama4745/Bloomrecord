@@ -12,6 +12,10 @@ export const qualityPresetSchema = z.enum(['low', 'medium', 'high']);
 export const resolutionPresetSchema = z.enum(['720p', '1080p', '1440p', '2160p', 'native']);
 export const frameRateSchema = z.union([z.literal(15), z.literal(24), z.literal(30), z.literal(60)]);
 export const themeSchema = z.enum(['system', 'light', 'dark']);
+export const backgroundEffectSchema = z.enum(['none', 'blur', 'image']);
+export const backgroundBlurSchema = z.enum(['light', 'strong']);
+export const BACKGROUND_PRESET_IDS = ['aurora', 'sunset', 'ocean', 'forest', 'slate', 'paper'] as const;
+export const backgroundPresetSchema = z.enum([...BACKGROUND_PRESET_IDS, 'custom']);
 
 export const idSchema = z.uuid();
 
@@ -48,10 +52,15 @@ export const settingsSchema = z.object({
   theme: themeSchema,
   countdownSeconds: z.number().int().min(0).max(10),
   minimizeOnRecord: z.boolean(),
+  backgroundEffect: backgroundEffectSchema,
+  backgroundBlur: backgroundBlurSchema,
+  backgroundPreset: backgroundPresetSchema,
+  /** File name of the user's custom background inside <userData>/backgrounds; set only by main. */
+  backgroundCustomImage: z.string().max(64).nullable(),
 });
 
 /** Settings the renderer may change directly. The output folder can only be set through the native dialog. */
-export const settingsPatchSchema = settingsSchema.omit({ outputDir: true }).partial().strict();
+export const settingsPatchSchema = settingsSchema.omit({ outputDir: true, backgroundCustomImage: true }).partial().strict();
 
 // ---------------------------------------------------------------------------
 // Capture

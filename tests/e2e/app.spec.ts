@@ -159,6 +159,54 @@ test('records camera-only with pause/resume, processes to MP4, trims and exports
   await app.close();
 });
 
+test('replaces the webcam background locally (MediaPipe) in the recorded video', async () => {
+  const { app, page } = await launch();
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Record' }).click();
+  await page.getByRole('radio', { name: 'Camera only' }).click();
+  await page.getByRole('radio', { name: 'Replace' }).click();
+  await page.getByRole('radio', { name: 'Paper' }).click();
+  await expect(page.locator('[data-background-status="active"]')).toBeVisible({ timeout: 30_000 });
+  const start = page.getByTestId('start-recording');
+  await expect(start).toBeEnabled({ timeout: 20_000 });
+  await start.click();
+  await expect(page.getByText('Recording', { exact: true })).toBeVisible({ timeout: 20_000 });
+  await page.waitForTimeout(3000);
+  await page.getByTestId('stop-recording').click();
+  await expect(page.getByTestId('player-video')).toBeVisible({ timeout: 120_000 });
+
+  const file = latestOutput();
+  createdFiles.push(file);
+  // The synthetic camera contains no person, so the whole frame becomes the light "Paper" background
+  // instead of the fake camera's dark green test pattern.
+  const px = execFileSync(ffmpeg, ['-v', 'error', '-ss', '1.5', '-i', file, '-frames:v', '1', '-vf', 'scale=1:1:flags=area', '-f', 'rawvideo', '-pix_fmt', 'rgb24', 'pipe:1']);
+  const [r, g, b] = [px[0]!, px[1]!, px[2]!];
+  console.log(`Average frame colour with Paper background: rgb(${r}, ${g}, ${b})`);
+  expect(r).toBeGreaterThan(190);
+  expect(g).toBeGreaterThan(185);
+  expect(b).toBeGreaterThan(170);
+
+  // Blur path: the background stays the camera's own (green) content, just blurred.
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Record' }).click();
+  await page.getByRole('radio', { name: 'Blur' }).click();
+  await expect(page.locator('[data-background-status="active"]')).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByTestId('start-recording')).toBeEnabled({ timeout: 20_000 });
+  await page.getByTestId('start-recording').click();
+  await expect(page.getByText('Recording', { exact: true })).toBeVisible({ timeout: 20_000 });
+  await page.waitForTimeout(3000);
+  await page.getByTestId('stop-recording').click();
+  await expect(page.getByTestId('player-video')).toBeVisible({ timeout: 120_000 });
+  const blurred = latestOutput();
+  createdFiles.push(blurred);
+  const bp = execFileSync(ffmpeg, ['-v', 'error', '-ss', '1.5', '-i', blurred, '-frames:v', '1', '-vf', 'scale=1:1:flags=area', '-f', 'rawvideo', '-pix_fmt', 'rgb24', 'pipe:1']);
+  console.log(`Average frame colour with blur: rgb(${bp[0]}, ${bp[1]}, ${bp[2]})`);
+  expect(bp[1]!).toBeGreaterThan(bp[0]! + 20); // still green-dominant, not replaced
+
+  // Turn the effect back off for the following tests.
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Record' }).click();
+  await page.getByRole('radio', { name: 'None' }).click();
+  await app.close();
+});
+
 test('records the screen with a circular webcam bubble', async () => {
   const { app, page } = await launch();
   await record(page, 'Screen + Camera', 4);
@@ -177,7 +225,7 @@ test('records the screen with a circular webcam bubble', async () => {
 test('library persists across restarts and the app made no network requests', async () => {
   const { app, page } = await launch();
   await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Library' }).click();
-  await expect(page.getByTestId('recording-card')).toHaveCount(3);
+  await expect(page.getByTestId('recording-card')).toHaveCount(5);
   await page.getByRole('textbox', { name: 'Search recordings' }).fill('trimmed');
   await expect(page.getByTestId('recording-card')).toHaveCount(1);
   await app.close();
